@@ -11,11 +11,10 @@ import * as csvWriter from 'csv-write-stream';
 dotenv.config();
 
 const argv = yargs
-  .usage('Usage: $0 --pattern <pattern> --org <org> [--csv <path>] [--language <language>]')
-  .option('pattern', {
-    describe: 'Pattern to search for in requirements.txt files',
+  .usage('Usage: $0 --line_pattern <line_pattern> --org <org> [--csv <path>] [--language <language>]')
+  .option('line_pattern', {
+    describe: 'Pattern to search for lines in files',
     type: 'string',
-    demandOption: true,
   })
   .option('org', {
     describe: 'GitHub organization to search in',
@@ -31,9 +30,9 @@ const argv = yargs
   })
   .help('h')
   .alias('h', 'help')
-  .argv as { pattern: string; org?: string; csv?: string; language?: string };
+  .argv as { line_pattern: string; org?: string; csv?: string; language?: string };
 
-const pattern = argv.pattern;
+const line_pattern = process.env.LINE_PATTERN || argv.line_pattern;
 const org = process.env.ORG || argv.org;
 const csv = process.env.CSV_PATH || argv.csv || '';
 const language = process.env.LANGUAGE || argv.language;
@@ -80,18 +79,18 @@ interface Match {
     lineNumber: number;
   }
   
-  // Function to search for the pattern in all .txt files under requirements folder
+  // Function to search for the line_pattern in all .txt files under requirements folder
   function searchPatternInRequirements(repoName: string): Match[] {
     const repoDir = path.join(__dirname, '..', REPOSITORIES_PATH, repoName);
-    const requirementsPattern = path.join(repoDir, 'requirements', '*.txt');
+    const requirementsPattern = path.join(repoDir, 'requirements/*.txt');
     const matches: Match[] = [];
-    const patternRegex = new RegExp(pattern); // Convert the pattern to a regular expression
+    const linePatternRegex = new RegExp(line_pattern); // Convert the line_pattern to a regular expression
     const files = glob.sync(requirementsPattern);
     files.forEach(filePath => {
       const fileContent = fs.readFileSync(filePath, 'utf-8');
       const lines = fileContent.split('\n');
       lines.forEach((line, index) => {
-        if (patternRegex.test(line)) { // Use the regex test method for pattern matching
+        if (linePatternRegex.test(line)) { // Use the regex test method for line_pattern matching
           matches.push({
             repoName: repoName,
             fileName: path.basename(filePath),

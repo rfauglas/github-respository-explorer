@@ -7,7 +7,7 @@
         "name": "Launch repo-explorer",
         // "preLaunchTask": "tsc: build - tsconfig.json",
         "program": "${workspaceFolder}/src/repo-explorer.ts",
-        "args": ["--pattern", ".*django-magic.git@3.*", "--csv", "out/found-references.csv"],
+        "args": [ "--csv", "out/found-references.csv"],
         "outFiles": [
           "${workspaceFolder}/dist/**/*.js"
         ],

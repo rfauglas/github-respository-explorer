@@ -3,7 +3,14 @@
 Empty Typescript project
 
 ## How to:
-
+Please see [Launch config]().vscode/launch.json) for example invocation
+```.env
+GITHUB_USER=<GIHUT_USER>
+GITHUB_TOKEN=<GITHUB_TOKEN>
+ORG=<Github organisation>
+LANGUAGE=Python
+LINE_PATTERN=<line matching pattern: defaults to .*>
+```
 ### Run this project
 
 1.  Build the code: `npm run build`
