@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Launch repo-explorer",
+        // "preLaunchTask": "tsc: build - tsconfig.json",
+        "program": "${workspaceFolder}/src/repo-explorer.ts",
+        "args": ["--pattern", ".*django-magic.git@3.*", "--csv", "out/found-references.csv", "--org", "ZeroGachis"],
+        "outFiles": [
+          "${workspaceFolder}/dist/**/*.js"
+        ],
+        "runtimeArgs": [
+          "-r", 
+          "ts-node/register",
+    
+        ],
+        "cwd": "${workspaceFolder}",
+        // "protocol": "inspector",
+        "console": "integratedTerminal"        
+      }
+    ]
+  }

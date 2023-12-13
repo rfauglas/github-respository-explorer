@@ -1,0 +1,13 @@
+{
+  "generator-ts-console": {
+    "typescript": {
+      "version": "5.3.3",
+      "outDir": "lib"
+    },
+    "package": {
+      "name": "github-respository-explorer",
+      "version": "0.0.1",
+      "description": "Empty Typescript project"
+    }
+  }
+}
