@@ -11,7 +11,7 @@ import * as csvWriter from 'csv-write-stream';
 dotenv.config();
 
 const argv = yargs
-  .usage('Usage: $0 --pattern <pattern> --org <org> [--csv <path>]')
+  .usage('Usage: $0 --pattern <pattern> --org <org> [--csv <path>] [--language <language>]')
   .option('pattern', {
     describe: 'Pattern to search for in requirements.txt files',
     type: 'string',
@@ -20,17 +20,29 @@ const argv = yargs
   .option('org', {
     describe: 'GitHub organization to search in',
     type: 'string',
-    demandOption: true,
   })
   .option('csv', {
     describe: 'Path to output CSV file with matches',
     type: 'string',
   })
+  .option('language', {
+    describe: 'Programming language to filter repositories by',
+    type: 'string',
+  })
   .help('h')
   .alias('h', 'help')
-  .argv as { pattern: string; org: string; csv?: string };
+  .argv as { pattern: string; org?: string; csv?: string; language?: string };
 
-const pattern = argv.pattern || '';
+const pattern = argv.pattern;
+const org = process.env.ORG || argv.org;
+const csv = process.env.CSV_PATH || argv.csv || '';
+const language = process.env.LANGUAGE || argv.language;
+
+if (!org) {
+  console.error('Error: The --org option is required.');
+  yargs.showHelp();
+  process.exit(1);
+}
 
 // Introduced constant for the repos folder path
 const REPOSITORIES_PATH = '.repositories';
@@ -107,10 +119,10 @@ async function main() {
   // Initialize an array to hold all matches
   const allMatches: Match[] = [];
 
-  // Fetch repositories from the provided organization that are written in Python
+  // Fetch repositories from the provided organization that are written in the specified language
   try {
     const { data } = await octokit.search.repos({
-      q: `org:${argv.org} language:Python`,
+      q: `org:${org} ${language? 'language:'+language:''}`,
       sort: 'updated',
       order: 'desc',
     });
@@ -137,6 +149,10 @@ async function main() {
   }
 }
 
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
 main().catch((error) => {
   console.error(error);
   process.exit(1);
