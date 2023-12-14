@@ -11,7 +11,7 @@ import * as csvWriter from 'csv-write-stream';
 dotenv.config();
 
 const argv = yargs
-  .usage('Usage: $0 --line_pattern <line_pattern> --org <org> [--csv <path>] [--language <language>]')
+  .usage('Usage: $0 [--line_pattern <line_pattern>] [--org <org>] [--csv <path>] [--language <language>] [--file_pattern <file_pattern>]')
   .option('line_pattern', {
     describe: 'Pattern to search for lines in files',
     type: 'string',
@@ -28,19 +28,24 @@ const argv = yargs
     describe: 'Programming language to filter repositories by',
     type: 'string',
   })
+  .option('file_pattern', {
+    describe: 'File pattern to search for in repositories',
+    type: 'string',
+  })
   .help('h')
   .alias('h', 'help')
-  .argv as { line_pattern: string; org?: string; csv?: string; language?: string };
+  .argv as { line_pattern: string; org?: string; csv?: string; language?: string; file_pattern?: string };
 
-const line_pattern = process.env.LINE_PATTERN || argv.line_pattern;
-const org = process.env.ORG || argv.org;
-const csv = process.env.CSV_PATH || argv.csv || '';
+const csv = process.env.CSV_PATH || argv.csv;
 const language = process.env.LANGUAGE || argv.language;
+const org = process.env.ORG || argv.org || exitMissingParameter();
+const line_pattern = process.env.LINE_PATTERN || exitMissingParameter();
+const file_pattern = process.env.FILE_PATTERN || exitMissingParameter();
 
-if (!org) {
-  console.error('Error: The --org option is required.');
+function exitMissingParameter(): string {
   yargs.showHelp();
   process.exit(1);
+  return "";
 }
 
 // Introduced constant for the repos folder path
@@ -79,10 +84,10 @@ interface Match {
     lineNumber: number;
   }
   
-  // Function to search for the line_pattern in all .txt files under requirements folder
+  // Function to search for the line_pattern in all files under the specified file_pattern
   function searchPatternInRequirements(repoName: string): Match[] {
     const repoDir = path.join(__dirname, '..', REPOSITORIES_PATH, repoName);
-    const requirementsPattern = path.join(repoDir, 'requirements/*.txt');
+    const requirementsPattern = path.join(repoDir, file_pattern);
     const matches: Match[] = [];
     const linePatternRegex = new RegExp(line_pattern); // Convert the line_pattern to a regular expression
     const files = glob.sync(requirementsPattern);
@@ -148,10 +153,6 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
 main().catch((error) => {
   console.error(error);
   process.exit(1);

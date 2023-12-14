@@ -10,6 +10,7 @@ GITHUB_TOKEN=<GITHUB_TOKEN>
 ORG=<Github organisation>
 LANGUAGE=Python
 LINE_PATTERN=<line matching pattern: defaults to .*>
+FILE_PATTERN=requirements/*.txt
 ```
 ### Run this project
 
